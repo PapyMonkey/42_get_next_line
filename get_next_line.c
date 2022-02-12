@@ -6,7 +6,7 @@
 /*   By: aguiri <aguiri@student.42nice.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/01 22:19:04 by aguiri            #+#    #+#             */
-/*   Updated: 2022/02/12 17:54:50 by aguiri           ###   ########.fr       */
+/*   Updated: 2022/02/12 19:02:32 by aguiri           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,12 +62,12 @@ char	*ft_get_current_line(char *buff_static)
 	len = 0;
 	while (buff_static[len] != '\0')
 	{
-		len++;
 		if (buff_static[len] == '\n')
 		{
 			len++;
 			break ;
 		}
+		len++;
 	}
 	line = (char *) malloc(sizeof(char) * (len + 1));
 	if (!line)
@@ -89,12 +89,12 @@ char	*ft_gnl_backup(char *buff_static)
 	i = 0;
 	while (buff_static[i])
 	{
-		i++;
 		if (buff_static[i] == '\n')
 		{
 			i++;
 			break ;
 		}
+		i++;
 	}
 	tmp = ft_strdup(buff_static + i);
 	if (!tmp)
@@ -117,9 +117,9 @@ char	*get_next_line(int fd)
 		return (NULL);
 	line = ft_get_current_line(backup);
 	/*
-	printf("backup address : %p\n", backup);
-	printf("backup value : %s\n", backup);
-	printf("line address : %p\n", line);
+	//printf("backup address : %p\n", backup);
+	printf("\nbackup value : %s\n", backup);
+	//printf("line address : %p\n", line);
 	printf("line value : %s\n", line);
 	*/
 	backup = ft_gnl_backup(backup);
