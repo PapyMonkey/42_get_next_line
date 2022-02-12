@@ -6,17 +6,38 @@
 /*   By: aguiri <aguiri@student.42nice.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/01 22:19:04 by aguiri            #+#    #+#             */
-/*   Updated: 2022/02/12 19:02:32 by aguiri           ###   ########.fr       */
+/*   Updated: 2022/02/12 21:16:20 by aguiri           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
+
+char	*ft_read_fd_extend(char *buff_static, char *buff, int r)
+{
+	char	*tmp;
+
+	if (r == -1)
+	{
+		free(buff);
+		free(buff_static);
+		return (NULL);
+	}
+	buff[r] = '\0';
+	tmp = ft_strjoin(buff_static, buff);
+	if (!tmp)
+	{
+		free(tmp);
+		free(buff_static);
+		free(buff);
+		return (NULL);
+	}
+	free(buff_static);
+	return (tmp);
+}
 
 char	*ft_read_fd(const int fd, char *buff_static)
 {
 	char	*buff;
-	char	*tmp;
 	int		r;
 
 	buff = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
@@ -30,23 +51,9 @@ char	*ft_read_fd(const int fd, char *buff_static)
 	while (r != 0 && !ft_strchr(buff_static, '\n'))
 	{
 		r = read(fd, buff, BUFFER_SIZE);
-		if (r == -1)
-		{
-			free(buff_static);
-			free(buff);
+		buff_static = ft_read_fd_extend(buff_static, buff, r);
+		if (!buff_static)
 			return (NULL);
-		}
-		buff[r] = '\0';
-		tmp = ft_strjoin(buff_static, buff);
-		if (!tmp)
-		{
-			free(tmp);
-			free(buff_static);
-			free(buff);
-			return (NULL);
-		}
-		free(buff_static);
-		buff_static = tmp;
 	}
 	free(buff);
 	return (buff_static);
@@ -116,12 +123,6 @@ char	*get_next_line(int fd)
 	if (backup == NULL)
 		return (NULL);
 	line = ft_get_current_line(backup);
-	/*
-	//printf("backup address : %p\n", backup);
-	printf("\nbackup value : %s\n", backup);
-	//printf("line address : %p\n", line);
-	printf("line value : %s\n", line);
-	*/
 	backup = ft_gnl_backup(backup);
 	if (backup == NULL)
 		return (NULL);
