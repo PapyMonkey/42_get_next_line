@@ -13,4 +13,4 @@
 | **External functions** | `read, malloc, free` |
 | **Description** | `Write a function that returns a line read from a file descriptor` |
 
-![get_next_line grade](https://badge42.herokuapp.com/api/project/aguiri/get_next_line)
+![get_next_line grade](https://badge42.vercel.app/api/v2/cl1m1z528009409l5bo2ovzih/project/2550555)
