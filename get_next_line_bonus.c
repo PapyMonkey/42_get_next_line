@@ -12,12 +12,14 @@
 
 #include "get_next_line_bonus.h"
 
+/*
 char	*ft_read_fd_extend(char *buff_static, char *buff, int r)
 {
 	char	*tmp;
 
 	if (r == -1)
 	{
+    ft_free_strs(
 		free(buff);
 		free(buff_static);
 		return (NULL);
@@ -34,32 +36,38 @@ char	*ft_read_fd_extend(char *buff_static, char *buff, int r)
 	free(buff_static);
 	return (tmp);
 }
+*/
 
-char	*ft_read_fd(const int fd, char *buff_static)
+//char	*ft_read_fd(const int fd, char *buff_keep)
+
+void	gnl_read_fd(const int fd, char **buff_keep)
 {
 	char	*buff;
+	char	*tmp;
 	int		r;
 
 	buff = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buff)
-	{
-		free(buff);
-		free(buff_static);
-		return (NULL);
-	}
+		return ;
 	r = 1;
-	while (r != 0 && !ft_strchr(buff_static, '\n'))
+	while (r != 0 && !ft_strchr(*buff_keep, '\n'))
 	{
 		r = read(fd, buff, BUFFER_SIZE);
-		buff_static = ft_read_fd_extend(buff_static, buff, r);
-		if (!buff_static)
-			return (NULL);
+		//buff_keep = ft_read_fd_extend(buff_keep, buff, r);
+    if (r == -1)
+    {
+      ft_free_strs(&buff, buff_keep, 0);
+      return ;
+    }
+    buff[r] = '\0';
+    tmp = ft_strjoin(*buff_keep, buff);
+    ft_free_strs(buff_keep, 0, 0);
+    *buff_keep = tmp;
 	}
-	free(buff);
-	return (buff_static);
+  ft_free_strs(&buff, 0, 0);
 }
 
-char	*ft_get_current_line(char *buff_static)
+char	*gnl_get_current_line(char *tmp_keep)
 {
 	int		i;
 	int		len;
@@ -67,9 +75,9 @@ char	*ft_get_current_line(char *buff_static)
 
 	i = 0;
 	len = 0;
-	while (buff_static[len] != '\0')
+	while (tmp_keep[len] != '\0')
 	{
-		if (buff_static[len] == '\n')
+		if (tmp_keep[len] == '\n')
 		{
 			len++;
 			break ;
@@ -82,32 +90,44 @@ char	*ft_get_current_line(char *buff_static)
 	line[len] = '\0';
 	while (i < len)
 	{
-		line[i] = buff_static[i];
+		line[i] = tmp_keep[i];
 		i++;
 	}
 	return (line);
 }
 
-char	*ft_gnl_backup(char *buff_static)
+char	*gnl_backup(char *tmp_keep)
 {
 	int		i;
-	char	*tmp;
+	char	*out;
 
 	i = 0;
-	while (buff_static[i])
+	while (tmp_keep[i])
 	{
-		if (buff_static[i] == '\n')
+		if (tmp_keep[i] == '\n')
 		{
 			i++;
 			break ;
 		}
 		i++;
 	}
-	tmp = ft_strdup(buff_static + i);
-	if (!tmp)
+	out = ft_strdup(tmp_keep + i);
+	if (!out)
 		return (NULL);
-	free(buff_static);
-	return (tmp);
+	return (out);
+}
+
+char  *gnl_parsing(char **buff_keep)
+{
+  char  *tmp_keep;
+  char  *line;
+
+  tmp_keep = ft_strdup(*buff_keep);
+  ft_free_strs(buff_keep, 0, 0);
+  line = gnl_get_current_line(tmp_keep);
+  *buff_keep = gnl_backup(tmp_keep);
+  ft_free_strs(&tmp_keep, 0, 0);
+  return (line);
 }
 
 char	*get_next_line(int fd)
@@ -117,21 +137,27 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || fd > 1024 || BUFFER_SIZE <= 0)
 		return (NULL);
-	if (backup[fd] == NULL)
-		backup[fd] = ft_strdup("");
-	backup[fd] = ft_read_fd(fd, backup[fd]);
-	if (backup[fd] == NULL)
-		return (NULL);
-	line = ft_get_current_line(backup[fd]);
-	backup[fd] = ft_gnl_backup(backup[fd]);
-	if (backup[fd] == NULL)
-		return (NULL);
-	if (line[0] == '\0')
+  //if (backup[fd] == NULL)
+		//backup[fd] = ft_strdup("");
+  line = NULL;
+
+  gnl_read_fd(fd, &backup[fd]);
+
+  // A enlever la ligne du dessous ?
+	//if (backup[fd] == NULL)
+		//return (NULL);
+
+	if (!backup[fd] && *backup[fd] != '\0')
+    line = gnl_parsing(&backup[fd]);
+	//backup[fd] = ft_gnl_backup(backup[fd]);
+  
+  // A enlever la ligne du dessous ?
+	//if (backup[fd] == NULL)
+		//return (NULL);
+	if (!line || line[0] == '\0')
 	{
-		free(backup[fd]);
-		free(line);
+    ft_free_strs(&backup[fd], &line, 0);
 		return (NULL);
 	}
-	else
-		return (line);
+	return (line);
 }

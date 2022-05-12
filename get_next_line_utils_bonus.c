@@ -12,6 +12,25 @@
 
 #include "get_next_line_bonus.h"
 
+void	ft_free_strs(char **str, char **str2, char **str3)
+{
+	if (str && *str)
+	{
+		free(*str);
+		*str = NULL;
+	}
+	if (str2 && *str2)
+	{
+		free(*str2);
+		*str2 = NULL;
+	}
+	if (str3 && *str3)
+	{
+		free(*str3);
+		*str3 = NULL;
+	}
+}
+
 int	ft_strlen(const char *str)
 {
 	int	i;
